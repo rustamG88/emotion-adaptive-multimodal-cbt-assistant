@@ -1,0 +1,179 @@
+// Prisma schema for MVP
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            Int       @id @default(autoincrement())
+  tgId          String    @unique
+  username      String?
+  firstName     String?
+  
+  // Onboarding
+  role          String    // female, male, other
+  age           Int
+  city          String
+  lat           Float?
+  lon           Float?
+  radiusKm      Int       @default(50)
+  showCity      Boolean   @default(true)
+  
+  // Profile data (JSON strings)
+  goals         String    // JSON: ["family", "dating", "friendship", "chat"]
+  interests     String    // JSON: ["coffee", "cinema", "sport", ...]
+  
+  // Profile details
+  height        Int?
+  bio           String?
+  photos        String    // JSON: ["file_id1", "file_id2", "file_id3"]
+  mainPhoto     String?
+  
+  // Optional
+  hasKids       String?   // yes, no, planning
+  languages     String?   // JSON: ["ru", "en"]
+  
+  // Verification
+  verifiedAt    DateTime?
+  verifiedBy    Int?
+  verificationStatus String @default("none") // none, pending, approved, rejected
+  verificationPhoto String?
+  
+  // Premium
+  premiumUntil  DateTime?
+  
+  // Reputation & moderation
+  reputation    Float     @default(0)
+  reportCount   Int       @default(0)
+  isBanned      Boolean   @default(false)
+  bannedUntil   DateTime?
+  bannedReason  String?
+  
+  // State & activity
+  state         String    @default("idle")   // FSM state
+  statePayload  String?   // JSON: temporary data for FSM
+  
+  isDeleted     Boolean   @default(false)
+  deletedAt     DateTime?
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastOnline    DateTime  @default(now())
+  
+  // Relations
+  sentMessages     Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
+  sentReports      Report[]  @relation("Reporter")
+  receivedReports  Report[]  @relation("Reported")
+  sentLikes        Like[]    @relation("LikeFrom")
+  receivedLikes    Like[]    @relation("LikeTo")
+  
+  @@index([city, age, isBanned, isDeleted])
+  @@index([tgId])
+}
+
+model Message {
+  id          Int      @id @default(autoincrement())
+  fromUserId  Int
+  toUserId    Int
+  text        String?
+  mediaFileId String?
+  mediaType   String?  // photo, voice, video
+  
+  isRead      Boolean  @default(false)
+  
+  createdAt   DateTime @default(now())
+  
+  fromUser User @relation("SentMessages", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser   User @relation("ReceivedMessages", fields: [toUserId], references: [id], onDelete: Cascade)
+  
+  @@index([fromUserId, toUserId, createdAt])
+  @@index([toUserId, isRead])
+}
+
+model Match {
+  id        Int      @id @default(autoincrement())
+  user1Id   Int
+  user2Id   Int
+  createdAt DateTime @default(now())
+  
+  @@unique([user1Id, user2Id])
+  @@index([user1Id])
+  @@index([user2Id])
+}
+
+model Like {
+  id        Int      @id @default(autoincrement())
+  fromId    Int
+  toId      Int
+  isSuperLike Boolean @default(false)
+  createdAt DateTime @default(now())
+  
+  fromUser User @relation("LikeFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  toUser   User @relation("LikeTo", fields: [toId], references: [id], onDelete: Cascade)
+  
+  @@unique([fromId, toId])
+  @@index([toId])
+}
+
+model Report {
+  id          Int      @id @default(autoincrement())
+  reporterId  Int
+  reportedId  Int
+  type        String   // fake, shaming, harassment, spam
+  evidence    String?  // JSON: {message_id, photo_file_id, text}
+  status      String   @default("open") // open, resolved, dismissed
+  
+  createdAt   DateTime @default(now())
+  resolvedAt  DateTime?
+  resolvedBy  Int?
+  action      String?  // warn, mute, ban, delete
+  adminNote   String?
+  
+  reporter User @relation("Reporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  reported User @relation("Reported", fields: [reportedId], references: [id], onDelete: Cascade)
+  
+  @@index([status, createdAt])
+  @@index([reportedId])
+}
+
+model Payment {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  provider    String   // stars
+  product     String   // premium_month, super_like
+  amount      Int
+  currency    String   // XTR
+  status      String   // pending, paid, failed, refunded
+  
+  telegramPaymentId String? @unique
+  telegramPayload   String? // Invoice payload for idempotency
+  
+  createdAt   DateTime @default(now())
+  paidAt      DateTime?
+  
+  @@index([userId, status])
+  @@index([status, createdAt])
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  tgId      String   @unique
+  role      String   // owner, admin, moderator
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  
+  @@index([tgId, isActive])
+}
+
+model Config {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  value     String   // JSON value
+  updatedAt DateTime @updatedAt
+}
