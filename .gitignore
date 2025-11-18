@@ -1,0 +1,14 @@
+*.iml
+.gradle/
+/local.properties
+/.idea/
+.DS_Store
+/build/
+app/build/
+core-ui/build/
+core-transport/build/
+core-mesh/build/
+core-crypto/build/
+core-storage/build/
+core-permissions/build/
+core-testing/build/

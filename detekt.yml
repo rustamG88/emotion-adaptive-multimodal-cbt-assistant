@@ -1,0 +1,19 @@
+config:
+  validation: true
+  warningsAsErrors: true
+
+processors:
+  active: true
+
+style:
+  MagicNumber:
+    active: false
+  MaxLineLength:
+    active: true
+    maxLineLength: 140
+  WildcardImport:
+    active: true
+
+naming:
+  PackageNaming:
+    active: true
