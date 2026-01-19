@@ -16,7 +16,7 @@ text_model:
   pretrained_name: "distilbert-base-uncased"
   max_seq_len: 128
   batch_size: 16
-  num_epochs: 3
+  num_epochs: 10
   learning_rate: 2e-5
   train_subset_fraction: 1.0      # 100% of full dataset
   class_balance_strategy: "weighted_random_sampler"  # or "oversample"

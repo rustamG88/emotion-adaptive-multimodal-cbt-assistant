@@ -48,7 +48,17 @@ class DeviceConfig:
     @property
     def device(self) -> torch.device:
         if self.device_str == "cuda":
-            return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+            if torch.cuda.is_available():
+                return torch.device("cuda")
+            elif torch.backends.mps.is_available():
+                return torch.device("mps")
+            else:
+                return torch.device("cpu")
+        elif self.device_str == "mps":
+             if torch.backends.mps.is_available():
+                 return torch.device("mps")
+             else:
+                 return torch.device("cpu")
         else:
             return torch.device(self.device_str)
 
@@ -57,6 +67,8 @@ class DeviceConfig:
 class ProjectConfig:
     name: str
     seed: int
+    debug_mode: bool
+    fast_dev_run: bool
     paths: PathsConfig
     text_model: TextModelConfig
     device: DeviceConfig
@@ -100,12 +112,14 @@ def load_config() -> ProjectConfig:
     else:
         # New format: device is a string
         device_str = str(device_raw)
-    
+
     device_cfg = DeviceConfig(device_str=device_str)
 
     return ProjectConfig(
         name=str(raw_cfg["project"]["name"]),
         seed=int(raw_cfg["project"]["seed"]),
+        debug_mode=bool(raw_cfg["project"].get("debug_mode", False)),
+        fast_dev_run=bool(raw_cfg["project"].get("fast_dev_run", False)),
         paths=paths_cfg,
         text_model=text_cfg,
         device=device_cfg,

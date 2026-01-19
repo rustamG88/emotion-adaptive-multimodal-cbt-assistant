@@ -27,3 +27,4 @@ streamlit
 # Misc
 matplotlib
 seaborn
+xgboost

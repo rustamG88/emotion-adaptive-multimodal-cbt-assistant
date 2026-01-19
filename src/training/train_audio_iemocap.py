@@ -155,7 +155,7 @@ def create_audio_dataloaders(cfg) -> Tuple[DataLoader, DataLoader, DataLoader]:
     cfg_path = Path(cfg_path_env) if cfg_path_env else PROJECT_ROOT / "config" / "config.yaml"
     with open(cfg_path, "r") as f:
         raw_cfg = yaml.safe_load(f)
-    
+
     # Get batch size from config
     batch_size = raw_cfg.get("iemocap_audio", {}).get("batch_size", 8)
 
@@ -250,9 +250,11 @@ def train_one_epoch(
                 # Ensure waveform is on CPU for MFCC extraction
                 waveform_cpu = waveform.cpu() if waveform.is_cuda else waveform
                 mfcc = extract_mfcc_from_waveform(waveform_cpu, sample_rate=sample_rate, n_mfcc=n_mfcc)
+                # logger.info(f"Waveform shape: {waveform_cpu.shape}, MFCC shape: {mfcc.shape}")
                 mfcc_features.append(mfcc)
             else:
                 # Fallback: create zero tensor
+                logger.warning(f"Invalid waveform type: {type(waveform)}")
                 mfcc_features.append(torch.zeros(n_mfcc, 100, dtype=torch.float32))
 
         # Pad sequences to same length and stack
@@ -417,14 +419,14 @@ def train_audio_iemocap():
     cfg_path = Path(cfg_path_env) if cfg_path_env else PROJECT_ROOT / "config" / "config.yaml"
     with open(cfg_path, "r") as f:
         raw_cfg = yaml.safe_load(f)
-    
+
     # Get IEMOCAP audio config
     iemocap_cfg = raw_cfg.get("iemocap_audio", {})
-    sample_rate = iemocap_cfg.get("audio_sample_rate", 16000)
-    n_mfcc = iemocap_cfg.get("n_mfcc", 40)
-    batch_size = iemocap_cfg.get("batch_size", 8)
-    learning_rate = iemocap_cfg.get("learning_rate", 2e-4)
-    num_epochs = iemocap_cfg.get("num_epochs", 20)
+    sample_rate = int(iemocap_cfg.get("audio_sample_rate", 16000))
+    n_mfcc = int(iemocap_cfg.get("n_mfcc", 40))
+    batch_size = int(iemocap_cfg.get("batch_size", 8))
+    learning_rate = float(iemocap_cfg.get("learning_rate", 2e-4))
+    num_epochs = int(iemocap_cfg.get("num_epochs", 20))
 
     logger.info(f"Sample rate: {sample_rate}")
     logger.info(f"MFCC coefficients: {n_mfcc}")

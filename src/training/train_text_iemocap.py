@@ -144,9 +144,9 @@ def train_text_model() -> None:
     logger.info(f"Random seed set to {cfg.seed}")
 
     # Check for debug/fast_dev_run mode
-    debug_mode = getattr(cfg.project, "debug_mode", False)
-    fast_dev_run = getattr(cfg.project, "fast_dev_run", False)
-    
+    debug_mode = getattr(cfg, "debug_mode", False)
+    fast_dev_run = getattr(cfg, "fast_dev_run", False)
+
     if debug_mode or fast_dev_run:
         logger.info("⚠ DEBUG MODE: Using small dataset subset and limited epochs")
 
@@ -192,7 +192,7 @@ def train_text_model() -> None:
     num_epochs = 1 if fast_dev_run else cfg.text_model.num_epochs
     if debug_mode:
         num_epochs = min(2, num_epochs)  # Max 2 epochs in debug mode
-    
+
     total_steps = len(train_loader) * num_epochs
     warmup_steps = int(0.1 * total_steps)
 
