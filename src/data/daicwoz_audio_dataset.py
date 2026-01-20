@@ -65,6 +65,9 @@ class DAICWOZAudioDataset(BaseAudioDataset):
         sample_rate: int = 16000,
         n_mfcc: int = 40,
         max_duration: float = 10.0,
+        window_size: Optional[float] = 10.0, # in seconds
+        hop_size: Optional[float] = 5.0,     # in seconds for overlap
+        feature_type: str = "mfcc",
     ):
         """
         Initialize DAIC-WOZ audio dataset.
@@ -75,9 +78,14 @@ class DAICWOZAudioDataset(BaseAudioDataset):
             split_name: Dataset split name (train, dev, test)
             sample_rate: Target sample rate for audio
             n_mfcc: Number of MFCC coefficients
-            max_duration: Maximum duration in seconds
+            max_duration: Maximum duration in seconds (ignored if window_size is set)
+            window_size: Size of sliding window segments in seconds
+            hop_size: Hop size for sliding window in seconds
+            feature_type: Type of features to return ("mfcc" or "raw")
         """
         self.logger = get_logger(__name__)
+        self.window_size = window_size
+        self.hop_size = hop_size
 
         # Load CSV metadata
         try:
@@ -175,13 +183,40 @@ class DAICWOZAudioDataset(BaseAudioDataset):
         # Convert records to samples format expected by BaseAudioDataset
         samples: List[Dict] = []
         for record in records:
-            sample = {
-                "audio_path": Path(record["audio_path"]),
-                "label": record["label"],
-            }
-            if "participant_id" in record:
-                sample["participant_id"] = record["participant_id"]
-            samples.append(sample)
+            if self.window_size is not None:
+                # Basic segmentation: we don't know audio duration yet,
+                # but we can get it from the file.
+                try:
+                    info = torchaudio.info(record["audio_path"])
+                    total_duration = info.num_frames / info.sample_rate
+
+                    start = 0.0
+                    while start + self.window_size <= total_duration:
+                        sample = {
+                            "audio_path": Path(record["audio_path"]),
+                            "label": record["label"],
+                            "start_sec": start,
+                            "duration_sec": self.window_size,
+                            "participant_id": record["participant_id"]
+                        }
+                        samples.append(sample)
+                        start += self.hop_size
+                except Exception as e:
+                    self.logger.warning(f"Failed to get info for {record['audio_path']}: {e}")
+                    # Fallback to single full-length or fixed-length sample
+                    samples.append({
+                        "audio_path": Path(record["audio_path"]),
+                        "label": record["label"],
+                        "participant_id": record["participant_id"]
+                    })
+            else:
+                sample = {
+                    "audio_path": Path(record["audio_path"]),
+                    "label": record["label"],
+                }
+                if "participant_id" in record:
+                    sample["participant_id"] = record["participant_id"]
+                samples.append(sample)
 
         # Initialize base class
         super().__init__(
@@ -190,8 +225,9 @@ class DAICWOZAudioDataset(BaseAudioDataset):
             dataset_name=self.dataset_name,
             sample_rate=sample_rate,
             n_mfcc=n_mfcc,
-            max_duration=max_duration,
+            max_duration=max_duration if window_size is None else window_size,
             split_name=split_name,
+            feature_type=feature_type,
         )
 
 
@@ -223,7 +259,7 @@ def create_daicwoz_datasets(
     train_csv_avec = SPLITS_DIR / "train_split_Depression_AVEC2017.csv"
     dev_csv_avec = SPLITS_DIR / "dev_split_Depression_AVEC2017.csv"
     test_csv_avec = SPLITS_DIR / "test_split_Depression_AVEC2017.csv"
-    
+
     train_csv = train_csv_avec if train_csv_avec.exists() else SPLITS_DIR / "train.csv"
     dev_csv = dev_csv_avec if dev_csv_avec.exists() else SPLITS_DIR / "dev.csv"
     test_csv = test_csv_avec if test_csv_avec.exists() else SPLITS_DIR / "test.csv"

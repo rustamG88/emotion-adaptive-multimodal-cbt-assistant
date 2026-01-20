@@ -94,6 +94,7 @@ class BaseAudioDataset(Dataset):
         max_duration: float = 10.0,
         split_name: str = "train",
         subset_ratio: float = 0.8,
+        feature_type: str = "mfcc", # "mfcc" or "raw"
     ):
         """
         Initialize base audio dataset.
@@ -110,6 +111,7 @@ class BaseAudioDataset(Dataset):
             max_duration: Maximum duration in seconds (crop/pad to this)
             split_name: Dataset split name (train, dev, test)
             subset_ratio: Fraction of samples to use for training split (default: 0.8)
+            feature_type: Type of features to return ("mfcc" or "raw")
         """
         self.cfg = cfg
         self.samples = samples
@@ -118,6 +120,7 @@ class BaseAudioDataset(Dataset):
         self.n_mfcc = n_mfcc
         self.max_duration = max_duration
         self.split_name = split_name
+        self.feature_type = feature_type
 
         # Setup cache directory
         self.cache_dir = cfg.paths.processed_dir / "audio"
@@ -241,20 +244,37 @@ class BaseAudioDataset(Dataset):
 
         Returns:
             Dictionary with:
-                - "features": torch.Tensor of shape (n_mfcc, time)
+                - "features": torch.Tensor of shape (n_mfcc, time) for MFCC, or (time,) for raw
                 - "label": int label
         """
-        mfcc = self._load_or_compute_mfcc(idx)
-        sample = self.samples[idx]
-        label = int(sample["label"])
+        if self.feature_type == "mfcc":
+            mfcc = self._load_or_compute_mfcc(idx)
+            sample = self.samples[idx]
+            label = int(sample["label"])
 
-        # Convert to torch tensor and transpose to (n_mfcc, time)
-        # mfcc from extract_mfcc is (time, n_mfcc)
-        mfcc_tensor = torch.tensor(mfcc, dtype=torch.float32)
-        features = mfcc_tensor.transpose(0, 1)  # (n_mfcc, time)
+            # Convert to torch tensor and transpose to (n_mfcc, time)
+            # mfcc from extract_mfcc is (time, n_mfcc)
+            mfcc_tensor = torch.tensor(mfcc, dtype=torch.float32)
+            features = mfcc_tensor.transpose(0, 1)  # (n_mfcc, time)
+        else:
+            # Load raw waveform
+            sample = self.samples[idx]
+            audio_path = sample["audio_path"]
+            label = int(sample["label"])
+
+            waveform = load_audio_mono(audio_path, self.sample_rate)
+
+            # Crop or pad to max_duration
+            max_samples = int(self.max_duration * self.sample_rate)
+            if len(waveform) > max_samples:
+                waveform = waveform[:max_samples]
+            elif len(waveform) < max_samples:
+                waveform = np.pad(waveform, (0, max_samples - len(waveform)), mode="constant")
+
+            features = torch.tensor(waveform, dtype=torch.float32)
 
         return {
-            "features": features,  # Shape: (n_mfcc, time)
+            "features": features,
             "label": torch.tensor(label, dtype=torch.long),
         }
 
