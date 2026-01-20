@@ -66,22 +66,38 @@ def generate_report():
 
         # Prepare data for plotting
         classes = []
+        precision_scores = []
+        recall_scores = []
         f1_scores = []
 
         for cls in class_names:
             m = data["per_class"][cls]
             html_content.append(f"<tr><td>{cls}</td><td>{m['precision']:.4f}</td><td>{m['recall']:.4f}</td><td>{m['f1']:.4f}</td><td>{m['support']}</td></tr>")
             classes.append(cls)
+            precision_scores.append(m["precision"])
+            recall_scores.append(m["recall"])
             f1_scores.append(m["f1"])
 
         html_content.append("</table>")
 
-        # Plot Per-Class F1
-        plt.figure(figsize=(10, 6))
-        sns.barplot(x=classes, y=f1_scores, palette="viridis")
-        plt.title(f"F1 Score per Class ({config_name})")
+        # Prepare dataframe for grouped bar chart
+        df_metrics = pd.DataFrame({
+            'Class': classes * 3,
+            'Score': precision_scores + recall_scores + f1_scores,
+            'Metric': ['Precision'] * len(classes) + ['Recall'] * len(classes) + ['F1'] * len(classes)
+        })
+
+        # Plot Grouped Metrics
+        plt.figure(figsize=(12, 6))
+        sns.barplot(data=df_metrics, x='Class', y='Score', hue='Metric', palette="viridis")
+        plt.title(f"Performance Metrics per Class ({config_name})")
+        plt.xlabel("Class")
+        plt.ylabel("Score")
         plt.xticks(rotation=45)
+        plt.ylim([0, 1])
+        plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
         plt.tight_layout()
+
         img_b64 = plot_to_base64(plt.gcf())
         html_content.append(f"<img src='data:image/png;base64,{img_b64}' />")
 

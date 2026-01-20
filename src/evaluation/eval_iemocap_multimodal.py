@@ -183,7 +183,12 @@ def evaluate_unimodal(
                 _, logits = model(input_ids=input_ids, attention_mask=attention_mask, labels=None)
             elif modality == "audio":
                 audio_mfcc = batch["audio_mfcc"].to(device)
-                logits = model(audio_mfcc)
+                # Audio model returns (loss, logits)
+                output = model(audio_mfcc)
+                if isinstance(output, tuple):
+                    _, logits = output
+                else:
+                    logits = output
             elif modality == "video":
                 video_frames = batch["video_frames"].to(device)
                 logits = model(video_frames)

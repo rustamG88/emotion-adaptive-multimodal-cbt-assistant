@@ -191,9 +191,17 @@ def create_audio_dataloaders(cfg) -> Tuple[DataLoader, DataLoader, DataLoader]:
             pin_memory=torch.cuda.is_available() if torch.cuda.is_available() else False,
         )
 
-    # Store label mapping in dataset for later use
+    # Store label mapping in all datasets for later use
     train_dataset.emotion_to_id = emotion_to_id
     train_dataset.id_to_emotion = {v: k for k, v in emotion_to_id.items()}
+
+    if val_dataset and len(val_dataset) > 0:
+        val_dataset.emotion_to_id = emotion_to_id
+        val_dataset.id_to_emotion = {v: k for k, v in emotion_to_id.items()}
+
+    if test_dataset and len(test_dataset) > 0:
+        test_dataset.emotion_to_id = emotion_to_id
+        test_dataset.id_to_emotion = {v: k for k, v in emotion_to_id.items()}
 
     return train_loader, val_loader, test_loader
 
@@ -247,15 +255,14 @@ def train_one_epoch(
         mfcc_features = []
         for waveform in audio_waveforms:
             if isinstance(waveform, torch.Tensor):
-                # Ensure waveform is on CPU for MFCC extraction
-                waveform_cpu = waveform.cpu() if waveform.is_cuda else waveform
-                mfcc = extract_mfcc_from_waveform(waveform_cpu, sample_rate=sample_rate, n_mfcc=n_mfcc)
-                # logger.info(f"Waveform shape: {waveform_cpu.shape}, MFCC shape: {mfcc.shape}")
+                # The dataset already returns MFCC features of shape (n_mfcc, time)
+                # No need to extract MFCC again
+                mfcc = waveform.to(device)
                 mfcc_features.append(mfcc)
             else:
                 # Fallback: create zero tensor
                 logger.warning(f"Invalid waveform type: {type(waveform)}")
-                mfcc_features.append(torch.zeros(n_mfcc, 100, dtype=torch.float32))
+                mfcc_features.append(torch.zeros(n_mfcc, 100, dtype=torch.float32).to(device))
 
         # Pad sequences to same length and stack
         if len(mfcc_features) > 0:
@@ -345,12 +352,11 @@ def evaluate_epoch(
             mfcc_features = []
             for waveform in audio_waveforms:
                 if isinstance(waveform, torch.Tensor):
-                    # Ensure waveform is on CPU for MFCC extraction
-                    waveform_cpu = waveform.cpu() if waveform.is_cuda else waveform
-                    mfcc = extract_mfcc_from_waveform(waveform_cpu, sample_rate=sample_rate, n_mfcc=n_mfcc)
+                    # Data is already MFCC features
+                    mfcc = waveform.to(device)
                     mfcc_features.append(mfcc)
                 else:
-                    mfcc_features.append(torch.zeros(n_mfcc, 100, dtype=torch.float32))
+                    mfcc_features.append(torch.zeros(n_mfcc, 100, dtype=torch.float32).to(device))
 
             # Pad and stack
             if len(mfcc_features) > 0:
