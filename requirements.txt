@@ -1,9 +1,8 @@
 # Core
 numpy
 pandas
-scikit-learn
-tqdm
 pyyaml
+tqdm
 
 # Deep learning
 torch
@@ -12,19 +11,16 @@ torchaudio
 
 # NLP
 transformers
-datasets
 
-# Audio
-librosa
+# ML utilities / metrics
+scikit-learn
 
-# Video & faces
+# Imaging
 opencv-python
-mtcnn
+Pillow
 
-# App
-streamlit
-
-# Misc
+# Plotting (used in results scripts)
 matplotlib
-seaborn
-xgboost
+
+# Video (only if your code uses PyAV)
+av

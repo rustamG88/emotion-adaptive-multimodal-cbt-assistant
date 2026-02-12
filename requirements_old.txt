@@ -1,0 +1,30 @@
+# Core
+numpy
+pandas
+scikit-learn
+tqdm
+pyyaml
+
+# Deep learning
+torch
+torchvision
+torchaudio
+
+# NLP
+transformers
+datasets
+
+# Audio
+librosa
+
+# Video & faces
+opencv-python
+mtcnn
+
+# App
+streamlit
+
+# Misc
+matplotlib
+seaborn
+xgboost
