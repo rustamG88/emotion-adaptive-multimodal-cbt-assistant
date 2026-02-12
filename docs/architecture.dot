@@ -1,0 +1,94 @@
+digraph G {
+  rankdir=TB;
+
+  graph [
+    fontsize=12,
+    fontname="Helvetica",
+    pad=0.25,
+    ranksep=0.45,
+    nodesep=0.35,
+    splines=ortho
+  ];
+
+  node  [
+    shape=box,
+    style="rounded",
+    fontsize=11,
+    fontname="Helvetica",
+    margin="0.14,0.10"
+  ];
+
+  edge  [
+    fontsize=10,
+    fontname="Helvetica",
+    arrowsize=0.7
+  ];
+
+  subgraph cluster_inputs {
+    label="User Inputs";
+    style="rounded";
+    labelloc="t";
+    T [label="Text message"];
+    A [label="Audio clip (optional)"];
+    V [label="Image / webcam snapshot (optional)"];
+  }
+
+  subgraph cluster_pre {
+    label="Pre-processing";
+    style="rounded";
+    labelloc="t";
+    TP [label="Text cleaning + tokenization"];
+    AP [label="Resample + feature extraction"];
+    VP [label="Resize + normalization"];
+  }
+
+  subgraph cluster_enc {
+    label="Unimodal Encoders";
+    style="rounded";
+    labelloc="t";
+    TE [label="Text encoder: DistilBERT (fine-tuned)\nOutput: text embedding"];
+    AE [label="Audio emotion encoder (optional)\nOutput: audio embedding"];
+    VE [label="Visual encoder: ResNet (pretrained, frozen)\nOutput: visual embedding"];
+  }
+
+  subgraph cluster_aux {
+    label="Auxiliary Clinical Signal";
+    style="rounded";
+    labelloc="t";
+    DR [label="Depression risk model (optional)\nCNN-BiLSTM trained on DAIC-WOZ\nOutput: risk score"];
+  }
+
+  subgraph cluster_fusion {
+    label="Multimodal Fusion";
+    style="rounded";
+    labelloc="t";
+    F1 [label="Concatenate / gating\n(handles missing modalities)"];
+    FH [label="Late fusion head (MLP)\ntrained on IEMOCAP"];
+  }
+
+  subgraph cluster_out {
+    label="Outputs";
+    style="rounded";
+    labelloc="t";
+    EO [label="Emotion distribution\nTop-2 emotions + confidence"];
+    CS [label="CBT strategy selector"];
+    RG [label="CBT response generator\nrule-based / simulated / external LLM"];
+    R  [label="Final CBT-style response\n(supportive, non-clinical)"];
+  }
+
+  /* --- Main flow as clean vertical stages --- */
+  { rank=same; T; A; V; }
+  { rank=same; TP; AP; VP; }
+  { rank=same; TE; AE; VE; }
+  { rank=same; F1; FH; }
+  { rank=same; EO; CS; RG; R; }
+
+  T -> TP -> TE -> F1;
+  A -> AP -> AE -> F1;
+  V -> VP -> VE -> F1;
+
+  /* Optional depression branch influencing strategy */
+  AP -> DR -> CS;
+
+  F1 -> FH -> EO -> CS -> RG -> R;
+}
